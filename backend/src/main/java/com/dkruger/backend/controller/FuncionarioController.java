@@ -62,6 +62,6 @@ public class FuncionarioController {
                                              .path("/{id}")
                                              .buildAndExpand(newFuncionario.getId_funcionario())
                                              .toUri();
-        return ResponseEntity.created(uri).body(newFuncionario);
+        return ResponseEntity.created(uri).body(newFuncionario); // oi
     }
 }
