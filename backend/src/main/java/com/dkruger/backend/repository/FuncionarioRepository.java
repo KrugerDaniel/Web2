@@ -13,6 +13,6 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, Intege
     @Query("SELECT objeto_func FROM Funcionario objeto_func WHERE objeto_func.department.id_department = :pIdDept ORDER BY nm_funcionario")
     List<Funcionario> findByDept(@Param(value = "pIdDept") Integer pIdDept);
 
-    @Query("SELECT objeto_func FROM Funcionario objeto_func where objeto_func.nm_funcionario like %:pNm_funcionario% ORDER BY nm_funcionario")
+    @Query("SELECT objeto_func FROM Funcionario objeto_func where objeto_func.nm_funcionario LIKE %:pNm_funcionario% ORDER BY nm_funcionario")
     List<Funcionario> findByName(@Param(value = "pNm_funcionario") String pNm_funcionario);
 }

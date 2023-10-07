@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.dkruger.backend.domain.Department;
 import com.dkruger.backend.domain.Funcionario;
+import com.dkruger.backend.exceptions.ObjectNotFoundException;
+import com.dkruger.backend.repository.DepartmentRepository;
 import com.dkruger.backend.repository.FuncionarioRepository;
 import com.dkruger.backend.services.FuncionarioServices;
 
@@ -29,6 +33,9 @@ public class FuncionarioController {
 
     @Autowired
     private FuncionarioServices funcionarioServices;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @GetMapping()
     public ResponseEntity<List<Funcionario>> findAll() {
@@ -51,17 +58,47 @@ public class FuncionarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFuncionario(@PathVariable Integer id) {
-        funcRepository.deleteById(id);
+        funcionarioServices.deleteFuncionario(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id_dept}")
     public ResponseEntity<Funcionario> insertFuncionario(@PathVariable Integer id_dept, @Valid @RequestBody Funcionario funcionario) {
         Funcionario newFuncionario = funcionarioServices.insertFuncionario(funcionario, id_dept);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                                             .path("/{id}")
-                                             .buildAndExpand(newFuncionario.getId_funcionario())
-                                             .toUri();
-        return ResponseEntity.created(uri).body(newFuncionario); // oi
+        URI uri = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(newFuncionario.getId_funcionario())
+            .toUri();
+        return ResponseEntity.created(uri).body(newFuncionario);
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Funcionario> updateFunc(@Valid @PathVariable Integer id, @RequestBody Funcionario func) {
+        Funcionario funcUpdated = funcionarioServices.updateFuncionario(id, func);
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/funcionario/{id}")
+            .buildAndExpand(funcUpdated.getId_funcionario())
+            .toUri();
+        return ResponseEntity.created(uri).body(funcUpdated);
+    }
+
+    @PutMapping(value = "{idFunc}/dept/{idDept}")
+    public ResponseEntity<Funcionario> updateFuncDept(@Valid @PathVariable Integer idFunc, @Valid @PathVariable Integer idDept) {
+        Funcionario funcUpdated = funcRepository.findById(idFunc)
+            .orElseThrow(
+                () -> new ObjectNotFoundException("Funcionario " + idFunc + " not found")
+            );
+        Department newDept = departmentRepository.findById(idDept)
+            .orElseThrow(
+                () -> new ObjectNotFoundException("Department " + idDept + " not found")
+            );
+        funcUpdated.setDepartment(newDept);
+        funcRepository.save(funcUpdated);
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/funcionario/{id}")
+            .buildAndExpand(funcUpdated.getId_funcionario())
+            .toUri();
+        return ResponseEntity.created(uri).body(funcUpdated);
     }
 }

@@ -5,8 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import com.dkruger.backend.domain.Aluno;
+import com.dkruger.backend.domain.Aula;
 import com.dkruger.backend.domain.Department;
 import com.dkruger.backend.domain.Funcionario;
+import com.dkruger.backend.repository.AlunoRepository;
+import com.dkruger.backend.repository.AulaRepository;
 import com.dkruger.backend.repository.DepartmentRepository;
 import com.dkruger.backend.repository.FuncionarioRepository;
 
@@ -23,8 +27,11 @@ public class BackendApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(DepartmentRepository deptRepo,
-		FuncionarioRepository funcRepo) {
+	public CommandLineRunner demo(
+		DepartmentRepository deptRepo,
+		FuncionarioRepository funcRepo,
+		AulaRepository aulaRepository,
+		AlunoRepository alunoRepository) {
 		return (args) -> {
 			Department dept1 = new Department(null, "Finanças");
 			Department dept2 = new Department(null, "Produção");
@@ -41,6 +48,16 @@ public class BackendApplication {
 			funcRepo.save(func2);
 			funcRepo.save(func3);
 			funcRepo.save(func4);
+
+			aulaRepository.save(new Aula(null, "Prog Web I", null));
+			aulaRepository.save(new Aula(null, "Prog Web II", null));
+			aulaRepository.save(new Aula(null, "Banco de dados", null));
+			aulaRepository.save(new Aula(null, "Banco de dados avançado", null));
+
+			alunoRepository.save(new Aluno(null, "Daniel", null));
+			alunoRepository.save(new Aluno(null, "Carlos", null));
+			alunoRepository.save(new Aluno(null, "Nicole", null));
+			alunoRepository.save(new Aluno(null, "Marlize", null));
 		};
 	}
 }
